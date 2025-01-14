@@ -1,5 +1,8 @@
 import {imgLoadError} from '/scripts/general.js';
-import data from "/data.json" with {type: 'json'};
+let data;
+fetch('/data.json')
+    .then(response => response.json())
+    .then(responseData => {data = responseData; console.log(responseData);})
 
 let photoIndex = 0;
 

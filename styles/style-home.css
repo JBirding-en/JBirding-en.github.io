@@ -52,7 +52,7 @@
         &:focus-visible {outline-width: 3px}
         border-radius: 5%;
         &:hover, &:focus-visible {
-            scale: 1.1;
+            scale: 1.07;
         }
         transition: scale 0.3s ease;
     }

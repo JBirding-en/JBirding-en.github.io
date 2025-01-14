@@ -1,6 +1,9 @@
-import data from "/data.json" with {type: 'json'};
 import {openCarousel} from "./carousel.js";
 import {parameters, imgLoadError, updateURL, triggerClickOnKey} from '../general.js';
+let data;
+fetch('/data.json')
+    .then(response => response.json())
+    .then(responseData => {data = responseData; console.log(responseData);})
 console.log(data);
 
 let langIndex;
