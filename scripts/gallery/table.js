@@ -2,7 +2,7 @@ import {openCarousel} from "./carousel.js";
 import {parameters, imgLoadError, updateURL, triggerClickOnKey} from '../general.js';
 const data = await fetch('/data.json')
     .then(response => response.json())
-    .then((a) => initializePhotos(a), a)
+    .then((a) => {initializePhotos(a); return a})
 
 console.log(data);
 

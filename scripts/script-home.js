@@ -1,6 +1,5 @@
 import {imgLoadError} from '/scripts/general.js';
-let data;
-fetch('/data.json')
+const data = await fetch('/data.json')
     .then(response => response.json())
     .then((a) => {
         a.sort((a,b)=>Math.random() - 0.5);
@@ -9,6 +8,8 @@ fetch('/data.json')
 
         return a;
     })
+
+console.log(data)
 
 let photoIndex = 0;
 
