@@ -2,10 +2,12 @@ import {imgLoadError} from '/scripts/general.js';
 let data;
 fetch('/data.json')
     .then(response => response.json())
-    .then((data) => {
-        data = data.sort((a,b)=>Math.random() - 0.5);
-        galleryImg.src = '/images-blur/'+data[photoIndex][0]+'-blur.JPG';
+    .then((a) => {
+        a.sort((a,b)=>Math.random() - 0.5);
+        galleryImg.src = '/images-blur/'+a[photoIndex][0]+'-blur.JPG';
         galleryImg.classList.add('blurry');
+
+        return a;
     })
 
 let photoIndex = 0;
