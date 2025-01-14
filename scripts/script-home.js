@@ -2,15 +2,17 @@ import {imgLoadError} from '/scripts/general.js';
 let data;
 fetch('/data.json')
     .then(response => response.json())
-    .then(responseData => {data = responseData; console.log(responseData);})
+    .then((data) => {
+        data = data.sort((a,b)=>Math.random() - 0.5);
+        galleryImg.src = '/images-blur/'+data[photoIndex][0]+'-blur.JPG';
+        galleryImg.classList.add('blurry');
+    })
 
 let photoIndex = 0;
 
-data.sort((a,b)=>Math.random() - 0.5)
+
 let galleryImg = document.getElementById('galleryImg');
 let nextImageLoader = document.createElement('img');
-galleryImg.src = '/images-blur/'+data[photoIndex][0]+'-blur.JPG';
-galleryImg.classList.add('blurry');
 galleryImg.onload = function(){
     this.setNewImgOnLoad('/images/'+data[photoIndex][0]+'.JPG');
     let elementToChange = this.parentElement.parentElement
@@ -32,6 +34,7 @@ galleryImg.onload = function(){
             nextImageLoader.setNewImgOnLoad('/images/'+data[++photoIndex][0]+'.JPG');
     },2000))}
 }
+
 nextImageLoader.onload = function(){
     galleryImg.parentElement.parentElement.classList.add('changingImage');
     console.log(galleryImg.parentElement.parentElement);

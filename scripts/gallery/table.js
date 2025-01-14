@@ -1,9 +1,9 @@
 import {openCarousel} from "./carousel.js";
 import {parameters, imgLoadError, updateURL, triggerClickOnKey} from '../general.js';
-let data;
-fetch('/data.json')
+let data = await fetch('/data.json')
     .then(response => response.json())
-    .then(responseData => {data = responseData; console.log(responseData);})
+    .then(data => {initializePhotos()})
+
 console.log(data);
 
 let langIndex;
