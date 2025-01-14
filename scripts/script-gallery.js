@@ -5,7 +5,7 @@ import {initializePhotos, urlFix} from "./gallery/table.js";
 
   window.focus();
   urlFix();
-  //initializePhotos();
+  initializePhotos();
 
   document.addEventListener('keydown', function(e){
     if(e.code === 'KeyP'){

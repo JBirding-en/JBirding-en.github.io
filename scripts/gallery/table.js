@@ -2,7 +2,6 @@ import {openCarousel} from "./carousel.js";
 import {parameters, imgLoadError, updateURL, triggerClickOnKey} from '../general.js';
 const data = await fetch('/data.json')
     .then(response => response.json())
-    .then((a) => {initializePhotos(a); return a})
 
 console.log(data);
 
@@ -55,7 +54,8 @@ let sortOptions = {
     'default': (a,b)=>(b[3]-a[3])*2+Math.sign(b[4]-a[4])+Math.random()*0.1-0.05,
 }
 
-function initializePhotos(data) {
+async function initializePhotos() {
+    await data;
     data.forEach(function (r) {
         sciOptions.push(r[1]);
         commonOptions.push(r[5 + langIndex]);
