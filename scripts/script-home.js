@@ -4,7 +4,7 @@ const data = await fetch('/data.json')
     .then((a) => {
         a.sort((a,b)=>Math.random() - 0.5);
         let galleryImg = document.getElementById('galleryImg');
-        galleryImg.src = '/images-blur/'+a[photoIndex][0]+'-blur.JPG';
+        galleryImg.src = '/images-blur/'+a[0][0]+'-blur.JPG';
         galleryImg.classList.add('blurry');
 
         return a;
