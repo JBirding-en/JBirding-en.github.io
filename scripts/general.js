@@ -76,7 +76,7 @@ function updateURL (params) {
     string += params.toString();
     url.search = string;
 
-    history.pushState(event.data,'',url.toString())
+    history.replaceState(event.data,'',url.toString())
 }
 
 function switchTheme() {
