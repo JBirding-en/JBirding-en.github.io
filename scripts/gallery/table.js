@@ -259,7 +259,6 @@ function changeSort() {
         sortSelect.removeAttribute('style')
     }
 
-    let now = new Date();
     if (sortType) {
         parameters.set('sort',sortType)
     } else {
@@ -327,6 +326,7 @@ function updatePageList() {
         pageListTop.insertBefore(pageButton, nextPaddleTop);
 
         let pageButtonClone = pageButton.cloneNode(true);
+        pageButtonClone.onclick = pageButton.onclick;
         pageListBottom.insertBefore(pageButtonClone, nextPaddleBottom);
     }
 
