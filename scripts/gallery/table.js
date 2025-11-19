@@ -342,10 +342,10 @@ function updatePageList() {
 function nextPage() {
     if(currentPage >= Math.ceil(filterData.length / photoLimit)) return;
     pageListTop.children[currentPage].classList.remove('current');
-    pageListBottom.children[currentPage].classList.add('current');
+    pageListBottom.children[currentPage].classList.remove('current');
     currentPage++;
     pageListTop.children[currentPage].classList.add('current');
-    pageListBottom.children[currentPage].classList.remove('current');
+    pageListBottom.children[currentPage].classList.add('current');
     main.innerHTML='';
     hidePaddles(currentPage);
 
