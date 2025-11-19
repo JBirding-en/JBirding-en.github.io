@@ -35,15 +35,15 @@
     color: var(--accent-color);
   }
 
-  #pageList>button.current, #pageList>.pagePaddle {
+  .pageList>button.current, .pageList>.pagePaddle {
     color: var(--accent-color);
   }
 
-  #pageList>button:hover, #pageList>button:focus-visible {
+  .pageList>button:hover, .pageList>button:focus-visible {
     background-color: var(--light-gray);
   }
 
-  #pageList>button:active{
+  .pageList>button:active{
     background: var(--light-gray-darker);
   }
 
@@ -99,15 +99,15 @@
     color: var(--accent-color-dark);
   }
 
-  #pageList>button.current, #pageList>.pagePaddle {
+  .pageList>button.current, .pageList>.pagePaddle {
     color: var(--accent-color-dark);
   }
 
-  #pageList>button:hover, #pageList>button:focus-visible {
+  .pageList>button:hover, .pageList>button:focus-visible {
     background-color: var(--dark-gray);
   }
 
-  #pageList>button:active{
+  .pageList>button:active{
     background: var(--dark-gray-lighter);
   }
 
@@ -1063,16 +1063,16 @@
   }
 
   /*page selection*/
-#pageList {
+.pageList {
   display: flex;
   justify-content: center;
 }
 
-#pageList.hidden {
+.pageList.hidden {
   display: none;
 }
 
-#pageList>button{
+.pageList>button{
   display: inline-block;
   font: inherit;
   font-size: 2em;
@@ -1090,7 +1090,7 @@
 }
 
 
-#pageList>button.hidden {
+.pageList>button.hidden {
   visibility: hidden;
 }
   /*page selection*/

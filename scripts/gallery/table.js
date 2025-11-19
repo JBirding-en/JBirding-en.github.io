@@ -38,7 +38,8 @@ shuffle.onkeydown = triggerClickOnKey;
 let closeSearch = document.getElementById('closesearch')
 closeSearch.onclick = clearSearch;
 
-let pageList = document.getElementById("pageList");
+let pageListTop = document.getElementById("pageListTop");
+let pageListBottom = document.getElementById("pageListBottom");
 let footer = document.querySelector('footer');
 let nobird = document.getElementById('nobird');
 let loader = document.getElementById('loadcontainer')
@@ -206,8 +207,8 @@ function generateTable(a){
     //loader.hidden = true
     footer.classList.remove('hidden')
     nobird.hidden = l !== 0;
-    if(l<=48) pageList.classList.add('hidden');
-    else pageList.classList.remove('hidden');
+    if(l<=48) pageListTop.classList.add('hidden');
+    else pageListTop.classList.remove('hidden');
 }
 
 
@@ -296,58 +297,79 @@ function tableFiltered() {
 
 function updatePageList() {
     let totalPages = Math.ceil(filterData.length / photoLimit);
-    while (pageList.children.length > 2) {
-        pageList.children[1].remove();
+    while (pageListTop.children.length > 2 && pageListBottom.children.length > 2) {
+        pageListTop.children[1].remove();
+        pageListBottom.children[1].remove();
     }
-    let nextPaddle = pageList.children[1];
+    let nextPaddleTop = pageListTop.children[1];
+    let nextPaddleBottom = pageListBottom.children[1];
 
     for(let i = 1; i <= totalPages; i++) {
         let pageButton = document.createElement('button');
-        pageButton.innerText = i;
+        pageButton.innerText = i.toString();
         pageButton.onclick = function(){
             if(currentPage===i) return;
-            pageList.children[currentPage].classList.remove('current');
+            pageListTop.children[currentPage].classList.remove('current');
+            pageListBottom.children[currentPage].classList.remove('current');
             currentPage=i;
-            this.classList.add('current');
+            pageListTop.children[currentPage].classList.add('current');
+            pageListBottom.children[currentPage].classList.add('current');
             main.innerHTML='';
             hidePaddles(currentPage);
 
             generateTable(filterData);
         };
-        pageList.insertBefore(pageButton, nextPaddle);
+        pageListTop.insertBefore(pageButton, nextPaddleTop);
+
+        let pageButtonClone = pageButton.cloneNode(true);
+        pageListBottom.insertBefore(pageButtonClone, nextPaddleBottom);
     }
 
     currentPage = 1;
-    if(totalPages>0) pageList.children[1].classList.add('current');
+    if(totalPages>0) {
+        pageListTop.children[1].classList.add('current');
+        pageListBottom.children[1].classList.add('current');
+    }
     hidePaddles(currentPage);
 }
 
-document.getElementById('nextPage').onclick = function nextPage() {
+
+function nextPage() {
     if(currentPage >= Math.ceil(filterData.length / photoLimit)) return;
-    pageList.children[currentPage].classList.remove('current');
+    pageListTop.children[currentPage].classList.remove('current');
+    pageListBottom.children[currentPage].classList.add('current');
     currentPage++;
-    pageList.children[currentPage].classList.add('current');
+    pageListTop.children[currentPage].classList.add('current');
+    pageListBottom.children[currentPage].classList.remove('current');
     main.innerHTML='';
     hidePaddles(currentPage);
 
     generateTable(filterData);
 }
 
-document.getElementById('previousPage').onclick = function previousPage() {
+function previousPage() {
     if(currentPage <= 1) return;
-    pageList.children[currentPage].classList.remove('current');
+    pageListTop.children[currentPage].classList.remove('current');
+    pageListBottom.children[currentPage].classList.add('current');
     currentPage--;
-    pageList.children[currentPage].classList.add('current');
+    pageListTop.children[currentPage].classList.add('current');
+    pageListBottom.children[currentPage].classList.remove('current');
     main.innerHTML='';
     hidePaddles(currentPage);
 
     generateTable(filterData);
 }
+
+document.getElementById('nextPageTop').onclick = nextPage;
+document.getElementById("nextPageBottom").onclick = nextPage;
+
+document.getElementById('previousPageTop').onclick = previousPage;
+document.getElementById('previousPageBottom').onclick = previousPage;
 
 function hidePaddles(pageNumber) {
     let totalPages = Math.ceil(filterData.length / photoLimit);
-    let rightPaddle = pageList.children[pageList.children.length-1];
-    let leftPaddle = pageList.children[0]
+    let rightPaddle = pageListTop.children[pageListTop.children.length-1];
+    let leftPaddle = pageListTop.children[0]
 
     if(pageNumber >= totalPages) {
         rightPaddle.classList.add('hidden');

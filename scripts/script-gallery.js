@@ -1,7 +1,7 @@
 // initialization 🔴
 
-import './general.js';
-import {initializePhotos, urlFix} from "./gallery/table.js";
+import '/scripts/general.js';
+import {initializePhotos, urlFix} from "/scripts/gallery/table.js";
 
   window.focus();
   urlFix();
@@ -46,12 +46,5 @@ import {initializePhotos, urlFix} from "./gallery/table.js";
     }
   }
 
-  window.addEventListener('resize',handleRotate)
-
-  screen.orientation.addEventListener('change',handleRotate)
-
-  function handleRotate() {
-    console.log(window.innerWidth/window.innerHeight)
-  }
 
 export {closeFullScreen, toggleFullScreen};
