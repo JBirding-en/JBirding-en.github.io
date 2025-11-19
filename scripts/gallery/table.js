@@ -42,7 +42,7 @@ let pageListTop = document.getElementById("pageListTop");
 let pageListBottom = document.getElementById("pageListBottom");
 let footer = document.querySelector('footer');
 let nobird = document.getElementById('nobird');
-let loader = document.getElementById('loadcontainer')
+
 
 let sortOptions = {
     'Random': ()=>Math.random()-0.5,
@@ -159,7 +159,7 @@ function generateTable(a){
             elementToChange.classList.remove('v');
             elementToChange.classList.remove('h');
             elementToChange.classList.add(this.naturalHeight > this.naturalWidth ? 'v' : 'h');
-            this.onload = '';
+            //this.onload = '';
         };
         photo.src = '/images-blur/'+a[i][0]+'-blur.JPG'
         photo.classList.add('blurry')
