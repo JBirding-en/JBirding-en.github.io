@@ -207,8 +207,6 @@ function generateTable(a){
     //loader.hidden = true
     footer.classList.remove('hidden')
     nobird.hidden = l !== 0;
-    if(l<=48) pageListTop.classList.add('hidden');
-    else pageListTop.classList.remove('hidden');
 }
 
 
@@ -279,7 +277,6 @@ function tableFiltered() {
 
     filterData = filterSomething(data,query)
 
-    let now = new Date();
     if (query) {
         parameters.set('search',query)
         closeSearch.hidden = false
@@ -303,6 +300,14 @@ function updatePageList() {
     }
     let nextPaddleTop = pageListTop.children[1];
     let nextPaddleBottom = pageListBottom.children[1];
+
+    if(totalPages <= 1) {
+        pageListTop.classList.add('hidden');
+        pageListBottom.classList.add('hidden');
+    } else {
+        pageListTop.classList.remove('hidden');
+        pageListBottom.classList.remove('hidden');
+    }
 
     for(let i = 1; i <= totalPages; i++) {
         let pageButton = document.createElement('button');
@@ -368,19 +373,26 @@ document.getElementById('previousPageBottom').onclick = previousPage;
 
 function hidePaddles(pageNumber) {
     let totalPages = Math.ceil(filterData.length / photoLimit);
-    let rightPaddle = pageListTop.children[pageListTop.children.length-1];
-    let leftPaddle = pageListTop.children[0]
+    let rightPaddleTop = pageListTop.children[pageListTop.children.length-1];
+    let leftPaddleTop = pageListTop.children[0]
+
+    let rightPaddleBottom = pageListBottom.children[pageListBottom.children.length-1];
+    let leftPaddleBottom = pageListBottom.children[0];
 
     if(pageNumber >= totalPages) {
-        rightPaddle.classList.add('hidden');
+        rightPaddleTop.classList.add('hidden');
+        rightPaddleBottom.classList.add('hidden');
     } else {
-        rightPaddle.classList.remove('hidden');
+        rightPaddleTop.classList.remove('hidden');
+        rightPaddleBottom.classList.remove('hidden');
     }
 
     if(pageNumber <= 1) {
-        leftPaddle.classList.add('hidden');
+        leftPaddleTop.classList.add('hidden');
+        leftPaddleBottom.classList.add('hidden');
     } else {
-        leftPaddle.classList.remove('hidden');
+        leftPaddleTop.classList.remove('hidden');
+        leftPaddleBottom.classList.remove('hidden');
     }
 }
 
