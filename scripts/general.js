@@ -1,6 +1,41 @@
-import './script-header.js';
-
 let imgPrototype = HTMLImageElement.prototype;
+
+
+
+let dummyImageLoadFunc = async function() {
+    if(this.wait) await this.wait;
+
+    //console.log(`dummyImg for ${this.src} has been loaded`);
+    //setTimeout(function(){
+    this.originalImg.classList.add('loadTransition');
+    this.originalImg.src = this.src;
+    this.originalImg.classList.remove('blurry')
+    this.originalImg.loaded = true;
+    this.originalImg.linked?.classList.add('loadTransition');
+    this.originalImg.linked?.setAttribute('src',this.src);
+    this.originalImg.linked?.classList.remove('blurry')
+    this.originalImg.linked?.setAttribute('loaded',true);
+    this.originalImg.linked?.fullImageLoader?.remove();
+    delete this.originalImg.linked?.fullImageLoader;
+
+    this.originalImg.ontransitionend = function() {this.classList.remove('loadTransition');this.ontransitionend = null;}
+    //}.bind(dummyImg),500);
+
+    this.remove();
+    delete this.originalImg.fullImageLoader;
+}
+
+let dummyImageErrorFunc = function() {
+    this.loadAttempts++;
+    if(this.loadAttempts >= 5) {
+        this.remove();
+        return;
+    }
+    setTimeout(function(){
+        console.log('Failed to load '+this.src+'. Attempting to load again')
+        this.src = this.src+'?'+dummyImg.loadAttempts;
+    },1000*(2**this.loadAttempts))
+}
 
 imgPrototype.setNewImgOnLoad = function(src,place = document.body) {
     let dummyImg = document.createElement('img');
@@ -11,38 +46,12 @@ imgPrototype.setNewImgOnLoad = function(src,place = document.body) {
     place?.appendChild(dummyImg);
     dummyImg.loading = 'eager';
 
-    dummyImg.onload = function() {
-        console.log(`dummyImg for ${src} has been loaded`);
-        //setTimeout(function(){
-        this.originalImg.classList.add('loadTransition');
-        this.originalImg.src = dummyImg.src;
-        this.originalImg.classList.remove('blurry')
-        this.originalImg.loaded = true;
-        this.originalImg.linked?.classList.add('loadTransition');
-        this.originalImg.linked?.setAttribute('src',this.src);
-        this.originalImg.linked?.classList.remove('blurry')
-        this.originalImg.linked?.setAttribute('loaded',true);
-        this.originalImg.linked?.fullImageLoader?.remove();
-        delete this.originalImg.linked?.fullImageLoader;
+    let randomTime = 200 + ((Math.random())**2)*1500
+    //console.log(`[${src}] will wait for at least ${randomTime/1000} seconds...`);
+    dummyImg.wait = new Promise(resolve => setTimeout(resolve, randomTime));
+    dummyImg.onload = dummyImageLoadFunc;
 
-        this.originalImg.ontransitionend = function() {this.classList.remove('loadTransition');this.ontransitionend = null;}
-        //}.bind(dummyImg),500);
-
-        this.remove();
-        delete this.originalImg.fullImageLoader;
-    }
-
-    dummyImg.onerror = function() {
-        this.loadAttempts++;
-        if(this.loadAttempts >= 5) {
-            this.remove();
-            return;
-        }
-        setTimeout(function(){
-            console.log('Failed to load '+src+'. Attempting to load again')
-            dummyImg.src = src+'?'+dummyImg.loadAttempts;
-        },1000*(2**this.loadAttempts))
-    }
+    dummyImg.onerror = dummyImageErrorFunc;
 
     dummyImg.src = src;
 }
@@ -58,7 +67,7 @@ imgPrototype.createLinkedCopy = function(){
 }
 
 function imgLoadError() {
-    this.src = 'logos/noload.png';
+    this.src = '/logos/noload.png';
     this.classList.remove('blurry');
     this.onerror = null;
 }
@@ -68,15 +77,29 @@ let parameters = url.searchParams;
 
 document.getElementById('year').textContent = ((new Date).getFullYear()>2024?'2024-'+(new Date).getFullYear():'2024');
 document.getElementById('language').onchange = function () {updateLanguage(this.value)}
-document.getElementById('theme').onclick = switchTheme;
-document.getElementById('theme').onkeydown = triggerClickOnKey;
 
 function updateURL (params) {
     let string = '?';
     string += params.toString();
     url.search = string;
 
-    history.replaceState(event.data,'',url.toString())
+    history.replaceState(null,'',url.toString())
+}
+
+function triggerClickOnKey(event) {
+    if(event.keyCode === 13 || event.keyCode === 32) {
+        event.preventDefault();
+        this.click();
+    }
+}
+
+function updateLanguage(lan) {
+    let newUrl;
+    if(lan === 'ES') newUrl = location.pathname.replaceAll('/en','');
+    else newUrl = location.pathname.replace('/','/en/');
+
+    history.pushState(null, newUrl);
+    location.replace(newUrl);
 }
 
 function switchTheme() {
@@ -90,16 +113,7 @@ function switchTheme() {
     }
 }
 
-function triggerClickOnKey(event) {
-    if(event.keyCode === 13 || event.keyCode === 32) {
-        event.preventDefault();
-        this.click();
-    }
-}
+document.getElementById('theme').onclick = switchTheme;
+document.getElementById('theme').onkeydown = triggerClickOnKey;
 
-function updateLanguage(lan) {
-    if(lan === 'ES') location.replace(location.pathname.replaceAll('/en',''));
-    else location.replace(location.pathname.replace('/','/en/'));
-}
-
-export {url, parameters, imgLoadError, updateURL, triggerClickOnKey}
+export {url, parameters, imgLoadError, updateURL, triggerClickOnKey, switchTheme}

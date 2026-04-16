@@ -1,5 +1,5 @@
-import {closeFullScreen, toggleFullScreen} from '../script-gallery.js';
-import {photos, names, sciNames, l} from "./table.js";
+import {closeFullScreen, toggleFullScreen} from '/scripts/script-gallery.js';
+import {photos, names, sciNames, total_photos} from "/scripts/gallery/table.js";
 
 
 const carousel = document.getElementById('carousel');
@@ -38,7 +38,7 @@ function handleTouchMove(evt) {
     const xDiff = xDown - xUp;
     const yDiff = yDown - yUp;
 
-    if ( Math.abs( xDiff ) > Math.abs( yDiff ) && Math.abs( xDiff ) >= w*0.05 && Math.abs(1000*xDiff/w/timeElapsed)>0.8 && l > 1 && evt.targetTouches.length === 1) {/*most significant*/
+    if ( Math.abs( xDiff ) > Math.abs( yDiff ) && Math.abs( xDiff ) >= w*0.05 && Math.abs(1000*xDiff/w/timeElapsed)>0.8 && total_photos > 1 && evt.targetTouches.length === 1) {/*most significant*/
         if ( xDiff > 0 ) {
             carouselNext()
         } else {
@@ -54,12 +54,12 @@ function handleTouchMove(evt) {
 
 document.addEventListener('keydown',(event) => { // carousel key functionality
     if (!carouselIsOpen()) return;
-    if (event.code === 'ArrowRight' && l > 1) {// move right
+    if (event.code === 'ArrowRight' && total_photos > 1) {// move right
         carouselNext();
         if(event.repeat) return;
         paddleright.classList.add('active');
         fastCarousel = setTimeout(accelerateCarousel,2000);
-    } else if (event.code === 'ArrowLeft' && l > 1) { // move left
+    } else if (event.code === 'ArrowLeft' && total_photos > 1) { // move left
         carouselPrevious();
         if(event.repeat) return;
         paddleleft.classList.add('active');
@@ -70,7 +70,7 @@ document.addEventListener('keydown',(event) => { // carousel key functionality
 })
 
 document.addEventListener('keyup',function(ev) {
-    if (ev.code === 'KeyO' && !carouselIsOpen() && l > 0) {
+    if (ev.code === 'KeyO' && !carouselIsOpen() && total_photos > 0) {
         forceOpen();
     } else if (ev.code === 'KeyF' && carouselIsOpen()) {
         toggleFullScreen();
@@ -104,6 +104,7 @@ const scicontainer = document.getElementById('scicontainer');
 
 const paddleleft = document.getElementById('paddleleft');
 const paddleright = document.getElementById('paddleright');
+let photoInfo = document.getElementById('photoinfo');
 
 let constMov;
 let fastCarousel;
@@ -118,6 +119,14 @@ paddleleft.onpointerdown = function() {carouselPrevious(); constMov = setInterva
 carousel.onpointerup = carousel.ontouchend = carousel.ontouchcancel = function() {clearInterval(constMov); clearTimeout(fastCarousel); document.querySelector(':root').style.removeProperty('--carousel-transition-duration')};
 //paddleright.onmouseout = paddleleft.onmouseout = function() {clearInterval(constMov)}
 //paddleleft.onmouseover = paddleright.onmouseover = function(){if(this.clicked){this.onpointerdown()}};
+
+photoInfo.ontransitionend = function () {
+    namecontainer.textContent = names[n];
+    scicontainer.textContent = sciNames[n];
+    this.classList.remove('changingContent');
+}
+
+
 
 
 document.getElementById('closecar').onclick = closeCarousel;
@@ -140,11 +149,12 @@ function openCarousel(photo) {
 
     document.addEventListener('keydown',disableTab);
 
+    carousel.onanimationend = function(){this.onanimationend=null;this.open=true;};
     carousel.classList.remove('closed');
     carousel.classList.add('open');
-    carousel.onanimationend = function(){this.onanimationend=null;this.open=true;};
+
     document.body.style.overflow = 'hidden';
-    if (l === 1) {
+    if (total_photos === 1) {
         document.getElementById('carouselLeftSide').classList.add('hidden');
         document.getElementById('carouselRightSide').classList.add('hidden');
     } else {
@@ -174,17 +184,17 @@ function closeCarousel() {
 
 
 function carouselNext() {
-    if(moving) return;
+    if (moving) return;
 
     moving = true;
-    n = (n+1) % photos.length
+    n = (n + 1) % photos.length
     console.log(n);
     let leftPhoto = document.querySelector("#leftPhotoContainer");
     let centerPhoto = document.querySelector("#centerPhotoContainer");
     let rightPhoto = document.querySelector("#rightPhotoContainer");
     let hiddenPhoto = document.querySelector("#hiddenPhotoRight");
 
-    centerPhoto.ontransitionend = function(){
+    centerPhoto.ontransitionend = function () {
         leftPhoto.classList.remove('nextPhoto');
         centerPhoto.classList.remove('nextPhoto');
         centerPhoto.style.removeProperty('scale');
@@ -196,20 +206,21 @@ function carouselNext() {
         moving = false;
     }
 
-    let sizeRatio = parseInt(getComputedStyle(centerPhoto).getPropertyValue('height'))/parseInt(getComputedStyle(leftPhoto).getPropertyValue('height'));
-    centerPhoto.style.scale = 1/sizeRatio;
+    let sizeRatio = parseInt(getComputedStyle(centerPhoto).getPropertyValue('height')) / parseInt(getComputedStyle(leftPhoto).getPropertyValue('height'));
+    centerPhoto.style.scale = 1 / sizeRatio;
     rightPhoto.style.scale = sizeRatio;
     leftPhoto.classList.add('nextPhoto');
     centerPhoto.classList.add('nextPhoto');
     rightPhoto.classList.add('nextPhoto');
     hiddenPhoto.classList.add('nextPhoto');
 
-    let photoInfo = document.getElementById('photoinfo');
-    photoInfo.classList.add('changingContent');
-    photoInfo.ontransitionend = function(){
-        namecontainer.textContent = names[n];
-        scicontainer.textContent = sciNames[n];
-        this.classList.remove('changingContent');
+
+
+    if (!document.fullscreenElement) {
+        photoInfo.classList.add('changingContent');
+    }
+    else {
+        photoInfo.ontransitionend();
     }
 
 }
@@ -271,35 +282,35 @@ function display(n) {
 
     hiddenPhotoLeftContainer.innerHTML = '';
     hiddenPhotoLeftContainer.appendChild(hiddenPhotoLeft);
-    if(!hiddenPhotoLeft.loaded) hiddenPhotoLeft.setNewImgOnLoad(hiddenPhotoLeft.src.replaceAll('-blur',''));
+    if(!hiddenPhotoLeft.loaded) hiddenPhotoLeft.setNewImgOnLoad(hiddenPhotoLeft.src.replaceAll('/blur',''));
     hiddenPhotoLeftContainer.classList.remove('v');
     hiddenPhotoLeftContainer.classList.remove('h');
-    hiddenPhotoLeftContainer.classList.add(hiddenPhotoLeft.linked.parentElement.parentElement.classList.contains('v') ? 'v' : 'h');
+    hiddenPhotoLeftContainer.classList.add(hiddenPhotoLeft.linked?.parentElement.parentElement.classList.contains('v') ? 'v' : 'h');
 
     leftPhotoContainer.innerHTML = '';
     leftPhotoContainer.appendChild(leftPhoto);
-    if(!leftPhoto.loaded) leftPhoto.setNewImgOnLoad(leftPhoto.src.replaceAll('-blur',''));
+    if(!leftPhoto.loaded) leftPhoto.setNewImgOnLoad(leftPhoto.src.replaceAll('/blur',''));
     leftPhotoContainer.classList.remove('v');
     leftPhotoContainer.classList.remove('h');
-    leftPhotoContainer.classList.add(leftPhoto.linked.parentElement.parentElement.classList.contains('v') ? 'v' : 'h');
+    leftPhotoContainer.classList.add(leftPhoto.linked?.parentElement.parentElement.classList.contains('v') ? 'v' : 'h');
 
     centerPhotoContainer.innerHTML = '';
     centerPhotoContainer.appendChild(centerPhoto);
-    if(!centerPhoto.loaded) centerPhoto.setNewImgOnLoad(centerPhoto.src.replaceAll('-blur',''));
+    if(!centerPhoto.loaded) centerPhoto.setNewImgOnLoad(centerPhoto.src.replaceAll('/blur',''));
     centerPhotoContainer.classList.remove('v');
     centerPhotoContainer.classList.remove('h');
     centerPhotoContainer.classList.add(centerPhoto.linked.parentElement.parentElement.classList.contains('v') ? 'v' : 'h');
 
     rightPhotoContainer.innerHTML = '';
     rightPhotoContainer.appendChild(rightPhoto);
-    if(!rightPhoto.loaded) rightPhoto.setNewImgOnLoad(rightPhoto.src.replaceAll('-blur',''));
+    if(!rightPhoto.loaded) rightPhoto.setNewImgOnLoad(rightPhoto.src.replaceAll('/blur',''));
     rightPhotoContainer.classList.remove('v');
     rightPhotoContainer.classList.remove('h');
     rightPhotoContainer.classList.add(rightPhoto.linked.parentElement.parentElement.classList.contains('v') ? 'v' : 'h');
 
     hiddenPhotoRightContainer.innerHTML = '';
     hiddenPhotoRightContainer.appendChild(hiddenPhotoRight);
-    if(!hiddenPhotoRight.loaded) hiddenPhotoRight.setNewImgOnLoad(hiddenPhotoRight.src.replaceAll('-blur',''));
+    if(!hiddenPhotoRight.loaded) hiddenPhotoRight.setNewImgOnLoad(hiddenPhotoRight.src.replaceAll('/blur',''));
     hiddenPhotoRightContainer.classList.remove('v');
     hiddenPhotoRightContainer.classList.remove('h');
     hiddenPhotoRightContainer.classList.add(hiddenPhotoRight.linked.parentElement.parentElement.classList.contains('v') ? 'v' : 'h');

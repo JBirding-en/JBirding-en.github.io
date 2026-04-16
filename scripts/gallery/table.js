@@ -1,15 +1,34 @@
-import {openCarousel} from "./carousel.js";
-import {parameters, imgLoadError, updateURL, triggerClickOnKey} from '../general.js';
-const data = await fetch('/data.json')
+import {openCarousel} from "/scripts/gallery/carousel.js";
+import {parameters, imgLoadError, updateURL, triggerClickOnKey} from '/scripts/general.js';
+
+const DB_ACCESS_URL = "https://g4bc8210ff017d8-jbirding.adb.eu-madrid-1.oraclecloudapps.com/ords/jbirding/bird_photos/";
+const langIndex = (document.getElementById('language').value === 'EN') + 0;
+const errorMessageES = "Hubo un error cargando los datos. Por favor, recarga la página."
+const errorMessageEN = "There was an error fetching photograph data! Please try again.";
+
+/*let total_photos = await fetch(DB_ACCESS_URL+'count')
     .then(response => response.json())
+    .then(json => json.count)*/
+
+let minWaitTime = 500+(Math.random()**2)*2000;
+//console.log("Waiting for at least "+(minWaitTime/1000)+" seconds before data is loaded");
+let minWait = new Promise(resolve => setTimeout(resolve, minWaitTime));
+
+let data = await fetch(DB_ACCESS_URL+'data/'+(langIndex?'en':'es'))
+    .then(response => response.json())
+    .then(json => json.items)
+    .catch(() => window.alert(langIndex ? errorMessageEN : errorMessageES));
+await minWait;
+let total_photos = 0;
 
 console.log(data);
 
-let langIndex;
-let currentPage, filterData;
-let l, option;
 
-let photoLimit = 48;
+
+let currentPage, filterData;
+let option;
+
+const photoLimit = 48;
 
 const photos = [];
 const names = [];
@@ -23,6 +42,36 @@ const sa = {
     F: ['','Female ',' hembra',''],
     J: ['','Juvenile ',' juvenil',''],
 }
+const nameLanguages = ['name_es','name_en']
+
+const searchFilter = function(elem) {
+    let globalAcum = false;
+    let query = search.value;
+
+    query.split('/').forEach(function(r){
+        let orTerm = r.trim()
+        let andAcum = true;
+
+        orTerm.split('&').forEach(function(s){
+            let searchParam = s.trim();
+            if(sciOptions.includes(searchParam)) {
+                andAcum = andAcum && elem.name_sci === searchParam
+            } else if (commonOptions.includes(searchParam)) {
+                andAcum = andAcum && elem.name_common === searchParam
+            } else if (saOptions[langIndex].includes(searchParam.toLowerCase())) {
+                andAcum = andAcum && sa[elem.class][2-langIndex].toLowerCase().trim() === searchParam.toLowerCase()
+            } else {
+                andAcum = andAcum && (elem.name_sci.toLowerCase().includes(searchParam.toLowerCase())
+                    || (sa[elem.class][langIndex]+elem.name_common+sa[elem.class][2+langIndex]).
+                    toLowerCase().includes(searchParam.toLowerCase()))
+            }
+        })
+
+        globalAcum = globalAcum || andAcum;
+    })
+    return globalAcum;
+}
+
 
 let main = document.getElementById("photoGallery");
 
@@ -46,23 +95,26 @@ let nobird = document.getElementById('nobird');
 
 let sortOptions = {
     'Random': ()=>Math.random()-0.5,
-    'Species A-Z': (a,b)=>a[5+langIndex].localeCompare(b[5+langIndex])+Math.random()*0.1-0.05,
-    'Species Z-A': (a,b)=>b[5+langIndex].localeCompare(a[5+langIndex])+Math.random()*0.1-0.05,
-    'Scientific name A-Z': (a,b)=>a[1].localeCompare(b[1])+Math.random()*0.1-0.05,
-    'Scientific name Z-A': (a,b)=>b[1].localeCompare(a[1])+Math.random()*0.1-0.05,
-    'Latest': (a,b)=>b.slice(-1)-a.slice(-1),
-    'Oldest': (a,b)=>a.slice(-1)-b.slice(-1),
-    'default': (a,b)=>(b[3]-a[3])*2+Math.sign(b[4]-a[4])+Math.random()*0.1-0.05,
+    'Species A-Z': (a,b)=>a.name_common.localeCompare(b.name_common)+Math.random()*0.1-0.05,
+    'Species Z-A': (a,b)=>b.name_common.localeCompare(a.name_common)+Math.random()*0.1-0.05,
+    'Scientific name A-Z': (a,b)=>a.name_sci.localeCompare(b.name_sci)+Math.random()*0.1-0.05,
+    'Scientific name Z-A': (a,b)=>b.name_sci.localeCompare(a.name_sci)+Math.random()*0.1-0.05,
+    'Latest': (a,b)=>Date.parse(b.date_shot)-Date.parse(a.date_shot),
+    'Oldest': (a,b)=>Date.parse(a.date_shot)-Date.parse(b.date_shot),
+    'Best': (a,b)=>Math.sign(b.priority-a.priority)+Math.random()*0.1-0.05,
+    'Highlight': (a,b)=>(b.highlight - a.highlight)*2 + Math.sign(b.priority-a.priority),
+
+    get default() {return this.Latest}
 }
 
 async function initializePhotos() {
     await data;
-    data.forEach(function (r) {
-        sciOptions.push(r[1]);
-        commonOptions.push(r[5 + langIndex]);
-    })
+    document.getElementById('loadcontainer').classList.add('closed');
 
-    filterData = filterSomething(data, search.value);
+    data.forEach(function (r) {
+        sciOptions.push(r.name_sci);
+        commonOptions.push(r.name_common);
+    })
 
     if (search.value) {
         closeSearch.hidden = false;
@@ -84,65 +136,19 @@ async function initializePhotos() {
     })
 
 
-
-    updatePageList();
-    filterData.sort(sortOptions[sortSelect.value] ?? sortOptions.default);
-    generateTable(filterData);
+    tableFiltered()
 }
 
-
-function unique (arr) {
-    const hash = {}, result = [];
-    for (let i = 0; i < arr.length; i++)
-        if (!(arr[i] in hash)) { //it works with objects! in FF, at least
-            hash[arr[i]] = true;
-            result.push(arr[i]);
-        }
-    return result;
-}
-
-function urlFix () {
-    let lang = document.getElementById('language').value;
-    console.log(lang)
-    langIndex = (lang === 'EN') + 0;
-    console.log(langIndex)
-
-    console.log(parameters.has('search'));
-    if (parameters.has('search')) {
-        console.log(search.value);
-        search.value = parameters.get('search')
-        closeSearch.hidden = false
-    }
-    if (parameters.has('sort')) {
-        if(parameters.get('sort') === 'Random') {
-            shuffle.hidden = false
-            sortSelect.style.paddingRight = '60px'
-        }
-        sortSelect.value = parameters.get('sort')
-    }
-}
-
-
-
-function resetGrid() {
-    main.innerHTML = '';
-    let sortType = sortSelect.value;
-    let sortFunction = sortOptions[sortType]??sortOptions.default;
-    filterData.sort(sortFunction);
-    currentPage = 1;
-    updatePageList();
-    generateTable(filterData);
-}
-
-function generateTable(a){
-    l = a.length
+function generateTable(data){
     let h = window.innerHeight
     let limit = Math.ceil((h-270)/330)*2
     photos.length = 0;
     names.length = 0;
     sciNames.length = 0;
 
-    for (let i = photoLimit*(currentPage-1); i < photoLimit*currentPage && i<l; i++) {
+    for (let i = photoLimit*(currentPage-1); i < photoLimit*currentPage && i<total_photos; i++) {
+
+        console.log(data[i]);
 
         let mainContainer = document.createElement('div')
         let imgDataContainer = document.createElement('div');
@@ -153,15 +159,11 @@ function generateTable(a){
         imgBorder.className = 'imgBorder'
 
         let photo = document.createElement('img')
-        photo.onload = function() {
-            this.setNewImgOnLoad('/images/'+a[i][0]+'.JPG',mainContainer)
-            let elementToChange = this.parentElement.parentElement
-            elementToChange.classList.remove('v');
-            elementToChange.classList.remove('h');
-            elementToChange.classList.add(this.naturalHeight > this.naturalWidth ? 'v' : 'h');
-            //this.onload = '';
-        };
-        photo.src = '/images-blur/'+a[i][0]+'-blur.JPG'
+
+        imgContainer.classList.toggle('v',data[i].is_vertical);
+        imgContainer.classList.toggle('h',!data[i].is_vertical);
+        photo.src = DB_ACCESS_URL+'blur/'+data[i].filename
+        photo.setNewImgOnLoad(DB_ACCESS_URL+data[i].filename,mainContainer)
         photo.classList.add('blurry')
         photo.onerror = imgLoadError;
         imgBorder.tabIndex = 0;
@@ -169,17 +171,17 @@ function generateTable(a){
         imgBorder.onkeydown = triggerClickOnKey;
         photos.push(photo);
 
-        photo.loading = (i>limit && i+2<=l) ? 'lazy' : 'eager'
+        photo.loading = (i>limit && i+2<=total_photos) ? 'lazy' : 'eager'
 
         photo.index = i - photoLimit*(currentPage-1);
         let name = document.createElement('div')
-        name.textContent = sa[a[i][2]][langIndex]+a[i][5+langIndex]+sa[a[i][2]][2+langIndex]
+        name.textContent = sa[data[i].class][langIndex]+data[i].name_common+sa[data[i].class][2+langIndex]
 
         name.classList.add('name');
         names.push(name.textContent);
 
         let sci = document.createElement('div')
-        sci.textContent = a[i][1]
+        sci.textContent = data[i].name_sci
         sci.classList.add('sci');
         sciNames.push(sci.textContent);
 
@@ -190,7 +192,7 @@ function generateTable(a){
         imgContainer.appendChild(imgBorder);
         imgBorder.appendChild(photo);
 
-        if(a[i][3]) {
+        if(data[i].highlight) {
             let star = document.createElement('div')
             let specialBg = document.createElement('div');
             star.textContent = '\u2605'
@@ -206,45 +208,53 @@ function generateTable(a){
 
     //loader.hidden = true
     footer.classList.remove('hidden')
-    nobird.hidden = l !== 0;
+    nobird.hidden = total_photos !== 0;
 }
 
+
+function unique (arr) {
+    const hash = {}, result = [];
+    for (let i = 0; i < arr.length; i++)
+        if (!(arr[i] in hash)) { //it works with objects! in FF, at least
+            hash[arr[i]] = true;
+            result.push(arr[i]);
+        }
+    return result;
+}
+
+function urlFix () {
+    console.log(parameters.has('search'));
+    if (parameters.has('search') || localStorage.getItem('search')) {
+        console.log(search.value);
+        search.value = parameters.get('search') ?? localStorage.getItem('search');
+        closeSearch.hidden = false
+    }
+    if (parameters.has('sort') || localStorage.getItem('sort')) {
+        console.log(parameters.get('sort') ?? localStorage.getItem('sort') === 'Random');
+        if((parameters.get('sort') ?? localStorage.getItem('sort')) === 'Random') {
+            shuffle.hidden = false
+            sortSelect.style.paddingRight = '60px'
+        }
+        sortSelect.value = parameters.get('sort') ?? localStorage.getItem('sort')
+    }
+}
+
+
+
+function resetGrid() {
+    main.innerHTML = '';
+    let sortType = sortSelect.value;
+    let sortFunction = sortOptions[sortType]??sortOptions.default;
+    filterData.sort(sortFunction);
+    currentPage = 1;
+    updatePageList();
+    generateTable(filterData);
+}
 
 
 function clearSearch() {
     search.value = ''
     tableFiltered()
-}
-
-function filterSomething(a,query) {
-    let f = function(elem) {
-        let globalAcum = false
-
-        query.split('/').forEach(function(r){
-            let orTerm = r.trim()
-            let andAcum = true;
-
-            orTerm.split('&').forEach(function(s){
-                let searchParam = s.trim();
-                if(sciOptions.includes(searchParam)) {
-                    andAcum = andAcum && elem[1] === searchParam
-                } else if (commonOptions.includes(searchParam)) {
-                    andAcum = andAcum && elem[5+langIndex] === searchParam
-                } else if (saOptions[langIndex].includes(searchParam.toLowerCase())) {
-                    andAcum = andAcum && sa[elem[2]][2-langIndex].toLowerCase().trim() === searchParam.toLowerCase()
-                } else {
-                    andAcum = andAcum && (elem[1].toLowerCase().includes(searchParam.toLowerCase())
-                        || (sa[elem[2]][langIndex]+elem[5+langIndex]+sa[elem[2]][2+langIndex]).
-                        toLowerCase().includes(searchParam.toLowerCase()))
-                }
-            })
-
-            globalAcum = globalAcum || andAcum;
-        })
-        return globalAcum;
-    }
-
-    return a.filter(f)
 }
 
 function changeSort() {
@@ -265,6 +275,7 @@ function changeSort() {
         parameters.delete('sort')
     }
     updateURL(parameters)
+    localStorage.setItem('sort',sortType);
 
     resetGrid()
 }
@@ -274,7 +285,8 @@ function tableFiltered() {
 
     main.innerHTML = ''
 
-    filterData = filterSomething(data,query)
+    filterData = data.filter(searchFilter)
+    total_photos = filterData.length;
 
     if (query) {
         parameters.set('search',query)
@@ -284,6 +296,7 @@ function tableFiltered() {
         closeSearch.hidden = true
     }
     updateURL(parameters)
+    localStorage.setItem('search', query)
 
     updatePageList();
 
@@ -292,7 +305,7 @@ function tableFiltered() {
 
 
 function updatePageList() {
-    let totalPages = Math.ceil(filterData.length / photoLimit);
+    let totalPages = Math.ceil(total_photos / photoLimit);
     while (pageListTop.children.length > 2 && pageListBottom.children.length > 2) {
         pageListTop.children[1].remove();
         pageListBottom.children[1].remove();
@@ -340,7 +353,7 @@ function updatePageList() {
 
 
 function nextPage() {
-    if(currentPage >= Math.ceil(filterData.length / photoLimit)) return;
+    if(currentPage >= Math.ceil(total_photos / photoLimit)) return;
     pageListTop.children[currentPage].classList.remove('current');
     pageListBottom.children[currentPage].classList.remove('current');
     currentPage++;
@@ -372,7 +385,7 @@ document.getElementById('previousPageTop').onclick = previousPage;
 document.getElementById('previousPageBottom').onclick = previousPage;
 
 function hidePaddles(pageNumber) {
-    let totalPages = Math.ceil(filterData.length / photoLimit);
+    let totalPages = Math.ceil(total_photos / photoLimit);
     let rightPaddleTop = pageListTop.children[pageListTop.children.length-1];
     let leftPaddleTop = pageListTop.children[0]
 
@@ -397,4 +410,4 @@ function hidePaddles(pageNumber) {
 }
 
 
-export {photos, names, sciNames, l, initializePhotos, urlFix}
+export {photos, names, sciNames, total_photos, initializePhotos, urlFix}

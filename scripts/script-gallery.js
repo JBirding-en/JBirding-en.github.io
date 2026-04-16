@@ -28,7 +28,7 @@ import {initializePhotos, urlFix} from "/scripts/gallery/table.js";
         docel.msRequestFullscreen();
       }
 
-    screen.orientation.lock('landscape')
+    try{screen.orientation.lock('landscape')} catch (_){}
   }
 
   function closeFullScreen() {

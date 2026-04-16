@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+---
+---
 <html lang='en' translate='no'>
 <head>
     <meta charset='UTF-8'/>
@@ -6,7 +7,7 @@
     <meta name="twitter:card" content="summary">
     <meta property="og:title" content="JBirding">
     <meta property="og:description" content="Galería de fotos">
-    <meta property="og:image" content="https://jbirding.com/images/metallura_phoebe-a-1.JPG">
+    <meta property="og:image" content="https://g4bc8210ff017d8-jbirding.adb.eu-madrid-1.oraclecloudapps.com/ords/jbirding/bird_photos/20250725_221315-Passer_domesticus-J-7033.JPG">
     <meta property="og:url" content="https://jbirding.com/">
 
  <!--Fonts-->
@@ -29,7 +30,8 @@
       JavaScript está desactivado en el navegador. Para ver la página, activa JavaScript.
     </div>
   </noscript>
-	<title>JBirding</title>
+	<title>Galería de fotos | JBirding</title>
+    <meta name="description" content="Galería de fotografías de aves de JBirding.com.">
 
 	<link rel="icon" type="image/x-icon" href="/favicon.ico">
 	<link rel="stylesheet" href="/styles/style-general.css">
@@ -38,43 +40,8 @@
 
 </head>
 <body>
-    <script>
-        let theme = localStorage.getItem('theme');
-        if(theme === 'dark-theme'){
-            document.body.classList.add("dark-theme");
-            document.body.classList.remove("light-theme");
-        } else if(theme) {
-            document.body.classList.add("light-theme");
-            document.body.classList.remove("dark-theme");
-        }
 
-        const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
-        if (prefersDarkScheme.matches && !theme) {
-            document.body.classList.add("dark-theme");
-            document.body.classList.remove("light-theme");
-        } else if(!theme) {
-            document.body.classList.add("light-theme");
-            document.body.classList.remove("dark-theme");
-        }
-    </script>
-
-    <header>
-        <a href="/" tabindex="-1"><img id='logo' src='/logos/jbirding-birds.svg'></a>
-
-        <div id="options">
-            <div id="theme" tabindex="0"></div>
-            <select id='language'>
-                <option value="ES">ES</option>
-                <option value="EN">EN</option>
-            </select>
-        </div>
-    </header>
-
-    <nav id='pages'>
-        <a id="homeLink" class='nav' tabindex="0" href="/">Inicio</a>
-        <a id="galleryLink" class='nav active' tabindex="0">Galería</a>
-        <a id="aboutLink" class='nav' tabindex="0" href="/about">Sobre mí</a>
-    </nav>
+    {% include header.html gallery="active" %}
 
 
 
@@ -144,15 +111,16 @@
             <div id='sortbox'>
                 <div id="sortbg">Ordenar por...</div>
                 <select id='sort'>
-
-                    <option value='' selected>Mejores</option>
+                    <option value="Latest" selected>Más recientes</option>
+                    <option value="Oldest">Más antiguas</option>
+                    <option value='Best'>Mejores</option>
+                    <option value='Highlight'>Destacadas primero</option>
                     <option value="Random">Aleatorio</option>
                     <option value="Species A-Z">Especie (A-Z)</option>
                     <option value="Species Z-A">Especie (Z-A)</option>
                     <option value="Scientific name A-Z">Nombre científico (A-Z)</option>
                     <option value="Scientific name Z-A">Nombre científico (Z-A)</option>
-                    <option value="Latest">Más recientes</option>
-                    <option value="Oldest">Más antiguas</option>
+
                 </select>
                 <div id='sortoptions'>
                     <div id="shuffleContainer">
@@ -162,8 +130,10 @@
             </div>
         </div>
 
-        <div id='loadcontainer' hidden>
-            Cargando imágenes<span id="load1">.</span><span id="load2">.</span><span id="load3">.</span>
+        <div id='loadcontainer'>
+            <svg><circle class="loadContainerCircle"/></svg>
+            <svg><circle class="loadContainerCircle"/></svg>
+            <svg><circle class="loadContainerCircle"/></svg>
         </div>
         <div id='nobird' hidden>No se han encontrado aves con esos criterios de búsqueda</div>
 
@@ -184,30 +154,6 @@
 
 
 
-	<footer class='hidden'>
-        <hr>
-
-        <div id="footerContents">
-            <div id="footerMiddle">
-                <nav id="footerNavigation">
-                    <a href="/">Inicio</a> |
-                    <a href="/gallery">Galería</a> |
-                    <a href="/about">Sobre mí</a>
-                </nav>
-                <nav id="socials">
-                    <a href="https://instagram.com/_erithacus_rubecula" target="_blank"><img
-                            src="/other_assets/iconmonstr-instagram-11.svg"></a>
-                    <a href="mailto:contact@jbirding.com" target="_blank"><img
-                            src="/other_assets/iconmonstr-email-4.svg"></a>
-                </nav>
-                <div id='copyright'>© JBirding <span id="year">2023</span><br>Todos los derechos reservados.</div>
-            </div>
-
-            <div id="footerRight">
-                <img id="footerLogo" src="/logos\J-pygargus\j-black-pygargus.png">
-            </div>
-        </div>
-
-	</footer>
+    {% include footer.html %}
 </body>
 </html>

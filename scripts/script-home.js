@@ -1,16 +1,31 @@
 import {imgLoadError} from '/scripts/general.js';
-const data = await fetch('/data.json')
+const DB_ACCESS_URL = "https://g4bc8210ff017d8-jbirding.adb.eu-madrid-1.oraclecloudapps.com/ords/jbirding/bird_photos/";
+const langIndex = (document.getElementById('language').value === 'EN') + 0;
+
+
+let loadedData = false;
+const data = await fetch(DB_ACCESS_URL+'data/'+(langIndex?'en':'es'))
     .then(response => response.json())
+    .then(json =>json.items)
     .then((a) => {
+        loadedData = true;
+
         a.sort((a,b)=>Math.random() - 0.5);
         let galleryImg = document.getElementById('galleryImg');
-        galleryImg.src = '/images-blur/'+a[0][0]+'-blur.JPG';
+
+        let imgContainer = galleryImg.parentElement.parentElement;
+        imgContainer.classList.toggle('v',a[0].is_vertical);
+        imgContainer.classList.toggle('h',!a[0].is_vertical);
+        imgContainer.classList.toggle('special',a[0].highlight)
+
+        galleryImg.src = DB_ACCESS_URL+'blur/'+a[0].filename;
+        galleryImg.setNewImgOnLoad(DB_ACCESS_URL+a[0].filename);
+        galleryImg.classList.add('blurry')
+        galleryImg.onerror = imgLoadError;
         galleryImg.classList.add('blurry');
 
         return a;
     })
-
-console.log(data)
 
 let photoIndex = 0;
 
@@ -18,37 +33,32 @@ let photoIndex = 0;
 let galleryImg = document.getElementById('galleryImg');
 let nextImageLoader = document.createElement('img');
 galleryImg.onload = function(){
-    this.setNewImgOnLoad('/images/'+data[photoIndex][0]+'.JPG');
-    let elementToChange = this.parentElement.parentElement
-    elementToChange.classList.remove('v');
-    elementToChange.classList.remove('h');
-    elementToChange.classList.add(this.naturalHeight > this.naturalWidth ? 'v' : 'h');
-    if(data[photoIndex][3]) elementToChange.classList.add('special');
-    else elementToChange.classList.remove('special');
+    console.log('gallery image has been loaded')
+    console.log('timeout :'+setTimeout(function(){
+            nextImageLoader.setNewImgOnLoad(DB_ACCESS_URL+data[photoIndex = (++photoIndex + data.length) % data.length].filename);
+        },2000))
+}
 
-    this.onload = function() {
-        console.log('gallery image has been loaded')
-        let elementToChange = this.parentElement.parentElement;
-        elementToChange.classList.remove('v');
-        elementToChange.classList.remove('h');
-        elementToChange.classList.add(this.naturalHeight > this.naturalWidth ? 'v' : 'h');
-        if(data[photoIndex][3]) elementToChange.classList.add('special');
-        else elementToChange.classList.remove('special');
-        console.log('timeout :'+setTimeout(function(){
-            nextImageLoader.setNewImgOnLoad('/images/'+data[++photoIndex][0]+'.JPG');
-    },2000))}
+let galleryLinkImgContainerHandler = function(){
+    galleryImg.src = nextImageLoader.src;
+
+    this.classList.toggle('v',data[0].is_vertical);
+    this.classList.toggle('h',data[0].is_vertical);
+    this.classList.toggle('special',data[0].highlight)
+
+    this.ontransitionend = null;
+    this.classList.remove('changingImage');
 }
 
 nextImageLoader.onload = function(){
+    galleryImg.parentElement.parentElement.ontransitionend = galleryLinkImgContainerHandler;
     galleryImg.parentElement.parentElement.classList.add('changingImage');
-    console.log(galleryImg.parentElement.parentElement);
-    galleryImg.parentElement.parentElement.ontransitionend = function(){
-        galleryImg.src = nextImageLoader.src;
-        this.classList.remove('changingImage');
-        this.ontransitionend = null;
-    }
 }
 galleryImg.onerror = imgLoadError;
+
+
+
+console.log(data)
 
 
 

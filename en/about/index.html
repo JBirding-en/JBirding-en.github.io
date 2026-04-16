@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+---
+---
 <html lang='es' translate='no'>
 <head>
     <meta charset='UTF-8'/>
@@ -25,7 +26,8 @@
             JavaScript está desactivado en el navegador. Para ver la página, activa JavaScript.
         </div>
     </noscript>
-    <title>JBirding</title>
+    <title>About JBirding</title>
+    <meta name="description" content="Find more about JBirding.">
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="/styles/style-general.css">
@@ -34,43 +36,9 @@
 
 </head>
 <body>
-<script>
-    let theme = localStorage.getItem('theme');
-    if(theme === 'dark-theme'){
-        document.body.classList.add("dark-theme");
-        document.body.classList.remove("light-theme");
-    } else if(theme) {
-        document.body.classList.add("light-theme");
-        document.body.classList.remove("dark-theme");
-    }
 
-    const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
-    if (prefersDarkScheme.matches && !theme) {
-        document.body.classList.add("dark-theme");
-        document.body.classList.remove("light-theme");
-    } else if(!theme) {
-        document.body.classList.add("light-theme");
-        document.body.classList.remove("dark-theme");
-    }
-</script>
 
-<header>
-    <a href="/en" tabindex="-1"><img id='logo' src='/logos/jbirding-birds.svg'></a>
-
-    <div id="options">
-        <div id="theme" tabindex="0"></div>
-        <select id='language'>
-            <option value="ES">ES</option>
-            <option value="EN" selected>EN</option>
-        </select>
-    </div>
-</header>
-
-<nav id='pages'>
-    <a id="homeLink" class='nav' tabindex="0" href="/en">Home</a>
-    <a id="galleryLink" class='nav' tabindex="0" href="/en/gallery">Gallery</a>
-    <a id="aboutLink" class='nav active' tabindex="0">About</a>
-</nav>
+{% include header_en.html about="active" %}
 
 
 
@@ -84,7 +52,7 @@
     Several years ago now, I started working along other people on a spreadsheet that serves as a guide with a ton of resources for a videogame.
     After much work gathering more and more information not found anywhere else (such as the damage formula), I started learning JavaScript
     to write scripts that would let me improve the sheet.
-    I also started making a website to be able to have all that information in a more accessible way, but soon after I started this site and... yeah.</p>
+    I also started making a website to be able to have all that information in a more accessible way, but soon after I started this project and... yeah.</p>
     <br>
     <p>Regarding this site, It began as a learning project in the summer of 2023.
     At first, I was convinced I'd be able to have it ready by September. Naturally, that was not the case.
@@ -97,37 +65,13 @@
     but, in part due to the horrible year I'd had with Physics, in part because I'd already started using JavaScript and I wanted to learn programming in a proper way,
     I changed my mind. There's a whopping one (1) subject about web design, but at least that's better than none.</p>
     <p>Surprisingly enough, there are other things I enjoy in life. For instance, I've been doing varsity debate
-        for several years now —in fact, in the gallery, there are several photos I took on a trip to Cape Verde as a prize for winning a competition.
+        for several years now —in fact, in the gallery, there are several photos I took while on a trip to Cape Verde I won as a prize for winning a competition.
     Besides, I also like a very niche 3DS game (the spreadsheet one) probably way too much.
         Back in high school, I did a project about the hidden math of the game and finding out the damage formula.
-    I'm also really fortunate to be a part of the team making the biggest mod in existence for the game. My contribution is being a huge nerd!</p>
+    I'm also really fortunate to be a part of the team making the biggest mod in existence for the game. Among other things, I made <a href="https://blastersplusplus.com">the mod's official website</a> —go check it (and the mod as a whole) out!</p>
 </main>
 
 
-<footer>
-    <hr>
-
-    <div id="footerContents">
-        <div id="footerMiddle">
-            <nav id="footerNavigation">
-                <a href="/en">Home</a> |
-                <a href="/en/gallery">Gallery</a> |
-                <a href="/en/about">About</a>
-            </nav>
-            <nav id="socials">
-                <a href="https://instagram.com/_erithacus_rubecula" target="_blank"><img
-                        src="/other_assets/iconmonstr-instagram-11.svg"></a>
-                <a href="mailto:contact@jbirding.com" target="_blank"><img
-                        src="/other_assets/iconmonstr-email-4.svg"></a>
-            </nav>
-            <div id='copyright'>© JBirding <span id="year"></span><br>All rights reserved.</div>
-        </div>
-
-        <div id="footerRight">
-            <img id="footerLogo" src="/logos\J-pygargus\j-black-pygargus.png">
-        </div>
-    </div>
-
-</footer>
+{% include footer_en.html %}
 </body>
 </html>

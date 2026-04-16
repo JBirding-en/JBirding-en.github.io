@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+---
+---
 <html lang='en' translate='no'>
 <head>
     <meta charset='UTF-8'/>
@@ -16,10 +17,10 @@
     <script src="/scripts/general.js" type="module"></script>
     <noscript>
         <div id='noscript'>
-            JavaScript está desactivado en el navegador. Para ver la página, activa JavaScript.
+            JavaScript is disabled in your browser. Please enable it to view this page.
         </div>
     </noscript>
-    <title>JBirding</title>
+    <title>Page Not Found</title>
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="/styles/style-general.css">
@@ -28,43 +29,9 @@
 
 </head>
 <body>
-<script>
-    let theme = localStorage.getItem('theme');
-    if(theme === 'dark-theme'){
-        document.body.classList.add("dark-theme");
-        document.body.classList.remove("light-theme");
-    } else if(theme) {
-        document.body.classList.add("light-theme");
-        document.body.classList.remove("dark-theme");
-    }
 
-    const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
-    if (prefersDarkScheme.matches && !theme) {
-        document.body.classList.add("dark-theme");
-        document.body.classList.remove("light-theme");
-    } else if(!theme) {
-        document.body.classList.add("light-theme");
-        document.body.classList.remove("dark-theme");
-    }
-</script>
 
-<header>
-    <a href="/" tabindex="-1"><img id='logo' src='/logos/jbirding-birds.svg'></a>
-
-    <div id="options">
-        <div id="theme" tabindex="0"></div>
-        <select id='language'>
-            <option value="ES">ES</option>
-            <option value="EN" selected>EN</option>
-        </select>
-    </div>
-</header>
-
-<nav id='pages'>
-    <a id="homeLink" class='nav' tabindex="0" href="/en">Home</a>
-    <a id="galleryLink" class='nav' tabindex="0" href="/en/gallery">Gallery</a>
-    <a id="aboutLink" class='nav' tabindex="0" href="/en/about">About</a>
-</nav>
+{% include header_en.html %}
 
 
 
@@ -76,30 +43,6 @@
 
 
 
-<footer>
-    <hr>
-
-    <div id="footerContents">
-        <div id="footerMiddle">
-            <nav id="footerNavigation">
-                <a href="/en">Home</a> |
-                <a href="/en/gallery">Gallery</a> |
-                <a href="/en/about">About</a>
-            </nav>
-            <nav id="socials">
-                <a href="https://instagram.com/_erithacus_rubecula" target="_blank"><img
-                        src="/other_assets/iconmonstr-instagram-11.svg"></a>
-                <a href="mailto:contact@jbirding.com" target="_blank"><img
-                        src="/other_assets/iconmonstr-email-4.svg"></a>
-            </nav>
-            <div id='copyright'>© JBirding <span id="year"></span><br>All rights reserved.</div>
-        </div>
-
-        <div id="footerRight">
-            <img id="footerLogo" src="/logos\J-pygargus\j-black-pygargus.png">
-        </div>
-    </div>
-
-</footer>
+{% include footer_en.html %}
 </body>
 </html>

@@ -1,5 +1,5 @@
 :root {
-  --carousel-transition-duration: 0.4s;
+  --carousel-transition-duration: 0.6s;
 }
 
 .light-theme {
@@ -62,6 +62,8 @@
   #shuffleContainer:has(:focus-visible) {
     outline: 1px solid var(--accent-color);
   }
+
+  .loadContainerCircle {fill: var(--accent-color);}
 }
 
 .dark-theme {
@@ -125,6 +127,9 @@
   #shuffleContainer:has(:focus-visible) {
     outline: 1px solid var(--accent-color-dark);
   }
+
+  .loadContainerCircle {fill: var(--accent-color-dark);}
+
   /*#search::placeholder, #search::-webkit-input-placeholder {
     color: red;
   }
@@ -281,34 +286,65 @@
 
   /*loader*/
 
+  @keyframes circleAnimation {
+    35% {transform: scale(var(--circle-scale))}
+
+    0%, 70%, 100% {transform: scale(1)}
+  }
+
   #loadcontainer {
-    width: 40%;
-    height: 30px;
+    width: min-content;
     margin-inline: auto;
 	margin-top: 40px;
+    margin-bottom: 40px;
     z-index: 1;
-   font-size: 2em;
+    display: flex;
+    flex-flow: row nowrap;
+
+    --circle-size: 30px;
+    --circle-scale: 1.4;
+
+    >:nth-child(1) {animation-delay: 0ms;}
+    >:nth-child(2) {animation-delay: 250ms;}
+    >:nth-child(3) {animation-delay: 500ms;}
+
+    gap: var(--circle-size);
+    svg {
+      width: var(--circle-size); height: var(--circle-size);
+      animation: circleAnimation 1s linear infinite;
+    }
+    .loadContainerCircle {
+      r: calc(var(--circle-size)/2);
+      cx: calc(var(--circle-size)/2);
+      cy: calc(var(--circle-size)/2);
+    }
+
+
+    height: 30px;
+    opacity: 1;
+
+    transition-property: opacity, height, margin;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-in-out;
+    transition-delay: 0.25s, 0s, 0s;
+
+    &.closed {
+      transition-delay: 0s, 0.25s, 0.25s;
+
+      pointer-events: none;
+
+      opacity: 0;
+      height: 0;
+      margin-block: 0;
+
+      svg {
+        animation: none;
+      }
+    }
+
+
   }
 
-  #progress {
-    line-height: 30px;
-    height: 100%;
-    width: 0;
-    background-color: black;
-    color: white;
-    font-weight: bold;
-    font-size: 14px;
-    animation: progress 2s linear forwards;
-  }
-
-  @keyframes progress {
-    0% {
-      width: 0;
-    }
-    100% {
-      width: 100%;
-    }
-  }
 
   /*carousel*/
 
@@ -411,66 +447,82 @@
   transform-origin: right center;
 }*/
 
-  @media (min-aspect-ratio: 1.75) {
+
+  @media (min-aspect-ratio: 4/3) {
     :fullscreen, :-webkit-full-screen {
-      #centerPhotoContainer, .sidePhotosContainer, #leftPhotoContainer, #rightPhotoContainer {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: calc(100vh*4/3);
+      #centerPhotoContainer, #carouselLeftSide, #carouselRightSide {
+        position: absolute;
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
+
+
       .sidephotos .blurry, .carphoto .blurry {
-        filter: blur(calc(10vh/3));
+        filter: blur(calc(10vh / 3));
       }
 
       #leftPhotoContainer, #rightPhotoContainer {
         opacity: 0;
       }
 
+      #leftPhotoContainer, #rightPhotoContainer, #centerPhotoContainer {
+        height: 100vh;
+        width: calc(100vh * 4/3);
+      }
+
+      .sidePhotosContainer.right, .sidePhotosContainer.left {
+        right: unset;
+        left: unset;
+      }
+
       #rightPhotoContainer .imgBorder, #leftPhotoContainer .imgBorder {
         pointer-events: none;
+
         img:not(.blurry) {
-          filter: blur(calc(10vh/3));
+          filter: blur(calc(10vh / 3));
         }
       }
 
       #carouselContents {
-        width: calc(100vw - 100vh*4/3);
+        width: 100%;
         position: absolute;
         right: 0;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr;
-        grid-gap: 20px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
 
         #centerPhotoData {
-          grid-column: 1/3;
-          grid-row: 1;
-          align-self: end;
+          height: 100%;
 
-          p {
-            padding-inline: 15px;
+          #photoinfo {
+            display: none
           }
-
-          width: 100%;
         }
 
-        #carouselLeftSide, #carouselRightSide {
-          grid-row: 2;
-          width: fit-content;
-          align-self: start;
-          justify-self: center;
+        #paddleleft {
+          position: absolute;
+          left: 5vw;
+        }
+
+        #paddleright {
+          position: absolute;
+          right: 5vw;
         }
       }
 
-      #centerPhotoContainer{
+      #centerPhotoContainer {
         &.nextPhoto, &.previousPhoto {
           .imgBorder img:not(.blurry) {
-            filter: blur(calc(100vh/30));
+            filter: blur(calc(100vh / 30));
             transition: var(--carousel-transition-duration) filter linear;
           }
+
           opacity: 0;
           transition-timing-function: linear;
           transform: none;
@@ -484,22 +536,27 @@
           filter: blur(0);
           transition: var(--carousel-transition-duration) filter linear;
         }
+
         opacity: 1;
         transition-timing-function: linear;
         transform: none;
         translate: none;
-        z-index: 200;
+        z-index: 6;
         top: 0;
+
         & .imgBorder {
           pointer-events: auto;
         }
       }
 
       .hiddenPhotoContainer {
-        &.nextPhoto, &.previousPhoto {opacity: 0}
+        &.nextPhoto, &.previousPhoto {
+          opacity: 0
+        }
       }
     }
   }
+
 
   @media (min-aspect-ratio: 2.1) {
 
@@ -516,243 +573,247 @@
     }
 
     #leftPhotoContainer.previousPhoto {
-      translate: calc(10vw*4/3 + 5vw);
+      translate: calc(10vw*4/3 * 0.5 + 5vw + 85vh * 0.8 * 4 / 3 * 0.5);
       top: -40px;
     }
 
     #centerPhotoContainer.previousPhoto {
-      translate: calc(10vw*4/3 + 5vw);
+      translate: calc(10vw*4/3 * 0.5 + 5vw + 85vh * 0.8 * 4 / 3 * 0.5);
       top: 40px;
     }
 
     #rightPhotoContainer.nextPhoto {
-      translate: calc(-10vw*4/3 - 5vw);
+      translate: calc(-10vw*4/3 * 0.5 - 5vw - 85vh * 0.8 * 4 / 3 * 0.5);
       top: -40px;
     }
 
     #centerPhotoContainer.nextPhoto {
-      translate: calc(-10vw*4/3 - 5vw);
+      translate: calc(-10vw*4/3 * 0.5 - 5vw - 85vh * 0.8 * 4 / 3 * 0.5);
       top: 40px;
     }
   }
 
-  @media (max-aspect-ratio: 2.1) and (min-aspect-ratio: 1.55) {
+  @media (min-aspect-ratio: 1.55) and (max-aspect-ratio: 2.1) {
     #carouselLeftSide, #carouselRightSide {
       flex-direction: column;
       gap: 1.5vw;
     }
 
     #leftPhotoContainer.previousPhoto {
-      translate: calc(10vw*4/3 + 5vw);
+      translate: calc(10vw*4/3 * 0.5 + 5vw + 85vh * 0.8 * 4 / 3 * 0.5);
       top: calc(-40px + 3.25vw);
     }
 
     #centerPhotoContainer.previousPhoto {
-      translate: calc(10vw*4/3 + 5vw);
+      translate: calc(10vw*4/3 * 0.5 + 5vw + 85vh * 0.8 * 4 / 3 * 0.5);
       top: calc(40px - 3.25vw);
     }
 
     #rightPhotoContainer.nextPhoto {
-      translate: calc(-10vw*4/3 - 5vw);
+      translate: calc(-10vw*4/3 * 0.5 - 5vw - 85vh * 0.8 * 4 / 3 * 0.5);
       top: calc(-40px + 3.25vw);
     }
 
     #centerPhotoContainer.nextPhoto {
-      translate: calc(-10vw*4/3 - 5vw);
+      translate: calc(-10vw*4/3 * 0.5 - 5vw - 85vh * 0.8 * 4 / 3 * 0.5);
       top: calc(40px - 3.25vw);
     }
   }
 
- @media (max-aspect-ratio: 1.55) {
+  @media (max-aspect-ratio: 1.55) {
 
-   .sidePhotosContainer.left {
-     position: absolute;
-     left: calc(-10vw*4/3);
-   }
+    .sidePhotosContainer.left {
+      position: absolute;
+      left: calc(-10vw*4/3);
+    }
 
-   .sidePhotosContainer.right {
-     position: absolute;
-     right: calc(-10vw*4/3);
-   }
+    .sidePhotosContainer.right {
+      position: absolute;
+      right: calc(-10vw*4/3);
+    }
 
-   #leftPhotoContainer.previousPhoto {
-     translate: calc(10vw*4/3 + 50vw - 68vh*4/3*0.5);
-     top: -40px;
-   }
+    #leftPhotoContainer.previousPhoto {
+      translate: calc(10vw*4/3 * 0.5 + 50vw);
+      top: -40px;
+    }
 
-   #centerPhotoContainer.previousPhoto {
-     translate: calc(10vw*4/3 + 50vw - 68vh*4/3*0.5);
-     top: 40px;
-   }
+    #centerPhotoContainer.previousPhoto {
+      translate: calc(10vw*4/3 * 0.5 + 50vw);
+      top: 40px;
+    }
 
-   #rightPhotoContainer.nextPhoto {
-     translate: calc(-10vw*4/3 - 50vw + 68vh*4/3*0.5);
-     top: -40px;
-   }
+    #rightPhotoContainer.nextPhoto {
+      translate: calc(-10vw*4/3 * 0.5 - 50vw);
+      top: -40px;
+    }
 
-   #centerPhotoContainer.nextPhoto {
-     translate: calc(-10vw*4/3 - 50vw + 68vh*4/3*0.5);
-     top: 40px;
-   }
- }
-
-@media (min-aspect-ratio: 1.2) {
-  .paddle {
-    font-size: 3vw;
-    height: 5vw;
-    width: 5vw;
-  }
-
-  .sidephotos .blurry {
-    filter: blur(calc(10vw/30));
-  }
-
-  #leftPhotoContainer.previousPhoto, #rightPhotoContainer.nextPhoto, .hiddenPhotoContainer.previousPhoto {
-    transition-timing-function: cubic-bezier(0.5,0,1,1), cubic-bezier(0,0,0.5,1), cubic-bezier(0,0,0.5,1), cubic-bezier(0,0,0.5,1);
-  }
-
-  #leftPhotoContainer.nextPhoto, #centerPhotoContainer.previousPhoto, #centerPhotoContainer.nextPhoto, #rightPhotoContainer.previousPhoto, .hiddenPhotoContainer.nextPhoto {
-    transition-timing-function: cubic-bezier(0,0,0.5,1), cubic-bezier(0.5,0,1,1), cubic-bezier(0.5,0,1,1), cubic-bezier(0.5,0,1,1);
-  }
-}
-
-@media (max-aspect-ratio: 1.2) {
-  .paddle {
-    position: absolute;
-    height: 10vw;
-    width: 10vw;
-    font-size: 6vw;
-  }
-
-  #paddleleft {
-    left: 5vw;
-  }
-
-  #paddleright {
-    right: 5vw;
-  }
-
-  #carousel #leftPhotoContainer, #carousel #rightPhotoContainer {
-    height: 68vh;
-    width: calc(68vh*4/3);
-    top: -40px;
-  }
-
-  .sidePhotosContainer.left {
-    position: absolute;
-    left: calc(-68vh*4/3);
-  }
-
-  .sidePhotosContainer.right {
-    position: absolute;
-    right: calc(-68vh*4/3);
-  }
-
-  #leftPhotoContainer.previousPhoto {
-    translate: calc(68vh*2/3 + 50vw);
-    top:0;
-  }
-
-  #centerPhotoContainer.previousPhoto {
-    translate: calc(68vh*2/3 + 50vw);
-    top:0;
-  }
-
-  #rightPhotoContainer.nextPhoto {
-    translate: calc(-68vh*2/3 - 50vw);
-    top:0;
-  }
-
-  #centerPhotoContainer.nextPhoto {
-    translate: calc(-68vh*2/3 - 50vw);
-    top:0;
-  }
-
-  #leftPhotoContainer.previousPhoto, #rightPhotoContainer.nextPhoto, .hiddenPhotoContainer.previousPhoto {
-    transition-timing-function: linear !important;
-  }
-
-  #leftPhotoContainer.nextPhoto, #centerPhotoContainer.previousPhoto, #centerPhotoContainer.nextPhoto, #rightPhotoContainer.previousPhoto, .hiddenPhotoContainer.nextPhoto {
-    transition-timing-function: linear !important;
-  }
-
-  .sidephotos .blurry {
-    filter: blur(calc(68vh/30));
-  }
-
-}
-
-@media (min-aspect-ratio: 1) {
-  #centerPhotoData {
-    width: calc(85vh*0.8*4/3);
-  }
-
-  #centerPhotoContainer {
-    height: 68vh;
-    width: 100%;
-  }
-
-  #carousel {
-    gap: 5vw
-  }
-
-  .carphoto .blurry {
-    filter: blur(calc(68vh/30));
-  }
-}
-
-@media (max-aspect-ratio: 1) {
-  #centerPhotoData {
-    width: 90vw;
-  }
-
-  #centerPhotoContainer {
-    max-height: calc(90vw*3/4);
-    height: calc(90vw*3/4);
-  }
-
-  #carousel #leftPhotoContainer, #carousel #rightPhotoContainer {
-    height: calc(90vw*3/4);
-    width: 90vw;
-    top: -40px;
-  }
-
-  #leftPhotoContainer.previousPhoto {
-    translate: 95vw;
-    top:0;
-  }
-
-  #centerPhotoContainer.previousPhoto {
-    translate: 95vw;
-    top:0;
-  }
-
-  #rightPhotoContainer.nextPhoto {
-    translate: -95vw;
-    top:0;
-  }
-
-  #centerPhotoContainer.nextPhoto {
-    translate: -95vw;
-    top:0;
-  }
-
-  .sidePhotosContainer.left {
-    position: absolute;
-    left: -90vw;
-  }
-
-  .sidePhotosContainer.right {
-    position: absolute;
-    right: -90vw;
-  }
-
-  .carphoto,.sidephotos{
-    .blurry {
-      filter: blur(2.25vw);
+    #centerPhotoContainer.nextPhoto {
+      translate: calc(-10vw*4/3 * 0.5 - 50vw);
+      top: 40px;
     }
   }
-}
+
+  @media (min-aspect-ratio: 1.2)  {
+    .paddle {
+      font-size: 3vw;
+      height: 5vw;
+      width: 5vw;
+    }
+
+    .sidephotos .blurry {
+      filter: blur(calc(10vw/30));
+    }
+
+    #leftPhotoContainer.previousPhoto, #rightPhotoContainer.nextPhoto, .hiddenPhotoContainer.previousPhoto {
+      transition-timing-function: cubic-bezier(0.5,0,1,1), cubic-bezier(0,0,0.5,1), cubic-bezier(0,0,0.5,1), cubic-bezier(0,0,0.5,1);
+    }
+
+    #leftPhotoContainer.nextPhoto, #centerPhotoContainer.previousPhoto, #centerPhotoContainer.nextPhoto, #rightPhotoContainer.previousPhoto, .hiddenPhotoContainer.nextPhoto {
+      transition-timing-function: cubic-bezier(0,0,0.5,1), cubic-bezier(0.5,0,1,1), cubic-bezier(0.5,0,1,1), cubic-bezier(0.5,0,1,1);
+    }
+  }
+
+  @media (max-aspect-ratio: 1.2) {
+    .paddle {
+      position: absolute;
+      height: 10vw;
+      width: 10vw;
+      font-size: 6vw;
+    }
+
+    #paddleleft {
+      left: 5vw;
+    }
+
+    #paddleright {
+      right: 5vw;
+    }
+
+    #carousel #leftPhotoContainer, #carousel #rightPhotoContainer {
+      height: 68vh;
+      width: calc(68vh*4/3);
+      top: -40px;
+    }
+
+    .sidePhotosContainer.left {
+      position: absolute;
+      left: calc(-68vh*4/3);
+    }
+
+    .sidePhotosContainer.right {
+      position: absolute;
+      right: calc(-68vh*4/3);
+    }
+
+    #leftPhotoContainer.previousPhoto {
+      translate: calc(68vh*2/3 + 50vw);
+      top:0;
+    }
+
+    #centerPhotoContainer.previousPhoto {
+      translate: calc(68vh*2/3 + 50vw);
+      top:0;
+    }
+
+    #rightPhotoContainer.nextPhoto {
+      translate: calc(-68vh*2/3 - 50vw);
+      top:0;
+    }
+
+    #centerPhotoContainer.nextPhoto {
+      translate: calc(-68vh*2/3 - 50vw);
+      top:0;
+    }
+
+    #leftPhotoContainer.previousPhoto, #rightPhotoContainer.nextPhoto, .hiddenPhotoContainer.previousPhoto {
+      transition-timing-function: linear !important;
+    }
+
+    #leftPhotoContainer.nextPhoto, #centerPhotoContainer.previousPhoto, #centerPhotoContainer.nextPhoto, #rightPhotoContainer.previousPhoto, .hiddenPhotoContainer.nextPhoto {
+      transition-timing-function: linear !important;
+    }
+
+    .sidephotos .blurry {
+      filter: blur(calc(68vh/30));
+    }
+
+  }
+
+  @media (min-aspect-ratio: 1) {
+    #centerPhotoData {
+      width: calc(85vh*0.8*4/3);
+    }
+
+    #centerPhotoContainer {
+      height: 68vh;
+      width: 100%;
+    }
+
+    #carousel {
+      gap: 5vw
+    }
+
+    .carphoto .blurry {
+      filter: blur(calc(68vh/30));
+    }
+  }
+
+  @media (max-aspect-ratio: 1) {
+    #centerPhotoData {
+      width: 90vw;
+    }
+
+    #centerPhotoContainer {
+      max-height: calc(90vw*3/4);
+      height: calc(90vw*3/4);
+    }
+
+    #carousel #leftPhotoContainer, #carousel #rightPhotoContainer {
+      height: calc(90vw*3/4);
+      width: 90vw;
+      top: -40px;
+    }
+
+    #leftPhotoContainer.previousPhoto {
+      translate: 95vw;
+      top:0;
+    }
+
+    #centerPhotoContainer.previousPhoto {
+      translate: 95vw;
+      top:0;
+    }
+
+    #rightPhotoContainer.nextPhoto {
+      translate: -95vw;
+      top:0;
+    }
+
+    #centerPhotoContainer.nextPhoto {
+      translate: -95vw;
+      top:0;
+    }
+
+    .sidePhotosContainer.left {
+      position: absolute;
+      left: -90vw;
+    }
+
+    .sidePhotosContainer.right {
+      position: absolute;
+      right: -90vw;
+    }
+
+    .carphoto,.sidephotos{
+      .blurry {
+        filter: blur(2.25vw);
+      }
+    }
+  }
+
+
+
+
 
 
   /*carousel based on aspect ratio*/
@@ -800,19 +861,19 @@
   }
 
   #leftPhotoContainer.previousPhoto {
-    transform-origin: left center;
+    transform-origin: center center;
   }
 
   #centerPhotoContainer.nextPhoto {
-    transform-origin: left center;
+    transform-origin: center center;
   }
 
   #rightPhotoContainer.nextPhoto {
-    transform-origin: right center;
+    transform-origin: center center;
   }
 
   #centerPhotoContainer.previousPhoto {
-    transform-origin: right center;
+    transform-origin: center center;
   }
 
   #leftPhotoContainer.previousPhoto, #rightPhotoContainer.nextPhoto {
@@ -872,7 +933,7 @@
   line-height: 0;
   justify-content: center;
   align-items: center;
-  z-index: 6;
+  z-index: 7;
   background-color: white;
   color: black;
   mix-blend-mode: screen;
