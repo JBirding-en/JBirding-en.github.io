@@ -33,7 +33,7 @@ let dummyImageErrorFunc = function() {
     }
     setTimeout(function(){
         console.log('Failed to load '+this.src+'. Attempting to load again')
-        this.src = this.src+'?'+dummyImg.loadAttempts;
+        this.src = this.src+'?'+this.loadAttempts;
     },1000*(2**this.loadAttempts))
 }
 
