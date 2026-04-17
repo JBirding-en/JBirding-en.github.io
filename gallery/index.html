@@ -6,7 +6,7 @@
 
     <meta name="twitter:card" content="summary">
     <meta property="og:title" content="JBirding">
-    <meta property="og:description" content="Galería de fotos">
+    <meta property="og:description" content="Photo gallery">
     <meta property="og:image" content="https://g4bc8210ff017d8-jbirding.adb.eu-madrid-1.oraclecloudapps.com/ords/jbirding/bird_photos/20250725_221315-Passer_domesticus-J-7033.JPG">
     <meta property="og:url" content="https://jbirding.com/">
 
@@ -27,11 +27,11 @@
     <!--script src="scripts/script-header.js"></script-->
   <noscript>
     <div id='noscript'>
-      JavaScript está desactivado en el navegador. Para ver la página, activa JavaScript.
+      JavaScript is disabled in your browser. Please enable it to view this page.
     </div>
   </noscript>
-	<title>Galería de fotos | JBirding</title>
-    <meta name="description" content="Galería de fotografías de aves de JBirding.com.">
+	<title>Photo Gallery | JBirding</title>
+    <meta name="description" content="JBirding bird photography gallery.">
 
 	<link rel="icon" type="image/x-icon" href="/favicon.ico">
 	<link rel="stylesheet" href="/styles/style-general.css">
@@ -41,22 +41,23 @@
 </head>
 <body>
 
-    {% include header.html gallery="active" %}
+
+    {% include header_en.html gallery="active" %}
 
 
 
 	<datalist id='birds'>
-      <option>Hembra</option>
-      <option>Macho</option>
-      <option>Juvenil</option>
+      <option>Female</option>
+      <option>Male</option>
+      <option>Juvenile</option>
     </datalist>
 
 
     <main>
         <div id='carousel' class="closed">
             <div id='closecar'></div>
-            <img id='fullscreen' src="/other_assets/fullscreen.svg" tabindex="0" title="Pantalla completa (F)">
-            <img id='closefullscreen' src="/other_assets/closeFullscreen.svg" tabindex="0" title="Pantalla completa (F)"
+            <img id='fullscreen' src="/other_assets/fullscreen.svg" tabindex="0" title="Fullscreen (F)">
+            <img id='closefullscreen' src="/other_assets/closeFullscreen.svg" tabindex="0" title="Exit fullscreen (F)"
                  hidden>
             <div id="carouselContents">
                 <div id="carouselLeftSide">
@@ -105,21 +106,21 @@
         <div id='tableOptions'>
             <div id='searchbox'>
                 <div id="searchBackground"></div>
-                <input list='birds' id='search' placeholder="Busca un ave...">
+                <input list='birds' id='search' placeholder="Search for a bird...">
                 <button hidden id='closesearch'>×</button>
             </div>
             <div id='sortbox'>
-                <div id="sortbg">Ordenar por...</div>
+                <div id="sortbg">Sort by</div>
                 <select id='sort'>
-                    <option value="Latest" selected>Más recientes</option>
-                    <option value="Oldest">Más antiguas</option>
-                    <option value='Best'>Mejores</option>
-                    <option value='Highlight'>Destacadas primero</option>
-                    <option value="Random">Aleatorio</option>
-                    <option value="Species A-Z">Especie (A-Z)</option>
-                    <option value="Species Z-A">Especie (Z-A)</option>
-                    <option value="Scientific name A-Z">Nombre científico (A-Z)</option>
-                    <option value="Scientific name Z-A">Nombre científico (Z-A)</option>
+                    <option value="Latest" selected>Latest</option>
+                    <option value="Oldest">Oldest</option>
+                    <option value='Best'>Best</option>
+                    <option value='Highlight'>Highlights First</option>
+                    <option value="Random">Random</option>
+                    <option value="Species A-Z">Species (A-Z)</option>
+                    <option value="Species Z-A">Species (Z-A)</option>
+                    <option value="Scientific name A-Z">Scientific Name (A-Z)</option>
+                    <option value="Scientific name Z-A">Scientific Name (Z-A)</option>
 
                 </select>
                 <div id='sortoptions'>
@@ -135,7 +136,7 @@
             <svg><circle class="loadContainerCircle"/></svg>
             <svg><circle class="loadContainerCircle"/></svg>
         </div>
-        <div id='nobird' hidden>No se han encontrado aves con esos criterios de búsqueda</div>
+        <div id='nobird' hidden>No birds matching the search criteria were found</div>
 
         <div id="pageListTop" class="hidden pageList">
             <button class="pagePaddle" id="previousPageTop" tabindex="0"><</button>
@@ -154,6 +155,6 @@
 
 
 
-    {% include footer.html %}
+    {% include footer_en.html %}
 </body>
 </html>

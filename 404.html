@@ -1,6 +1,6 @@
 ---
 ---
-<html lang='es' translate='no'>
+<html lang='en' translate='no'>
 <head>
     <meta charset='UTF-8'/>
 
@@ -17,10 +17,10 @@
     <script src="/scripts/general.js" type="module"></script>
     <noscript>
         <div id='noscript'>
-            JavaScript está desactivado en el navegador. Para ver la página, activa JavaScript.
+            JavaScript is disabled in your browser. Please enable it to view this page.
         </div>
     </noscript>
-    <title>Página no encontrada</title>
+    <title>Page Not Found</title>
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="/styles/style-general.css">
@@ -31,19 +31,18 @@
 <body>
 
 
-    {% include header.html %}
+{% include header_en.html %}
 
 
 
 <main>
     <p style="font-size: 10em;font-weight: 900;margin: 0">404</p>
-    <p style="display: none">va a ser el estado de su dih cuando me la coma entera</p>
-    <p style="font-size: 1.5em; margin: 10px">No se ha encontrado la página solicitada.</p>
+    <p style="font-size: 1.5em; margin: 10px">The requested page couldn't be found</p>
 </main>
 
 
-    {% include footer.html %}
 
 
+{% include footer_en.html %}
 </body>
 </html>
