@@ -14,11 +14,12 @@ let minWaitTime = 500+(Math.random()**2)*2000;
 //console.log("Waiting for at least "+(minWaitTime/1000)+" seconds before data is loaded");
 let minWait = new Promise(resolve => setTimeout(resolve, minWaitTime));
 
-let data = await fetch(DB_ACCESS_URL+'data/'+(langIndex?'en':'es'))
+let data;
+let dataPromise = fetch(DB_ACCESS_URL+'data/'+(langIndex?'en':'es'))
     .then(response => response.json())
     .then(json => json.items)
     .catch(() => window.alert(langIndex ? errorMessageEN : errorMessageES));
-await minWait;
+
 let total_photos = 0;
 
 console.log(data);
@@ -108,7 +109,9 @@ let sortOptions = {
 }
 
 async function initializePhotos() {
-    await data;
+    data = await dataPromise;
+    await minWait;
+
     document.getElementById('loadcontainer').classList.add('closed');
 
     data.forEach(function (r) {

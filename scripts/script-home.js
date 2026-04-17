@@ -34,17 +34,17 @@ let galleryImg = document.getElementById('galleryImg');
 let nextImageLoader = document.createElement('img');
 galleryImg.onload = function(){
     console.log('gallery image has been loaded')
-    console.log('timeout :'+setTimeout(function(){
+    if(this.loaded) setTimeout(function(){
             nextImageLoader.setNewImgOnLoad(DB_ACCESS_URL+data[photoIndex = (++photoIndex + data.length) % data.length].filename);
-        },2000))
+        },2000)
 }
 
 let galleryLinkImgContainerHandler = function(){
     galleryImg.src = nextImageLoader.src;
 
-    this.classList.toggle('v',data[0].is_vertical);
-    this.classList.toggle('h',data[0].is_vertical);
-    this.classList.toggle('special',data[0].highlight)
+    this.classList.toggle('v',data[photoIndex].is_vertical);
+    this.classList.toggle('h',!data[photoIndex].is_vertical);
+    this.classList.toggle('special',data[photoIndex].highlight)
 
     this.ontransitionend = null;
     this.classList.remove('changingImage');
