@@ -1,5 +1,8 @@
 ---
-species: Turdus merula
+species:
+  - name_sci: Turdus merula
+    name_es: Mirlo común
+    name_en: Eurasian Blackbird
 title: Blackbirds' Hunting Strategies
 citations:
   - title: "Mirlo común - SEO/BirdLife"

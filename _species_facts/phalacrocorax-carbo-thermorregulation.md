@@ -1,5 +1,8 @@
 ---
-species: Phalacrocorax carbo
+species:
+  - name_sci: Phalacrocorax carbo
+    name_es: Cormorán grande
+    name_en: Great Cormorant
 title: Cormorants' Curious Cooling Conduct
 ---
 Birds, much like other animals, use various means of thermorregulation.
