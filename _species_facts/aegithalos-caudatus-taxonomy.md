@@ -1,9 +1,6 @@
 ---
-species:
-  - name_sci: Aegithalos caudatus
-    name_es: Mito común
-    name_en: Long-Tailed Tit
-title: The Tit's Family
+species: Aegithalos caudatus
+title: The Tit's F[aegithalos-caudatus-taxonomy.md](aegithalos-caudatus-taxonomy.md)amily
 citations:
   - title: "Earth history and the passerine superradiation"
     url: https://pmc.ncbi.nlm.nih.gov/articles/PMC6475423/
