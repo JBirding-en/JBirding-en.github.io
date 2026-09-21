@@ -1,5 +1,8 @@
 ---
-species: Aegithalos caudatus
+species:
+  - name_sci: Aegithalos caudatus
+    name_es: Mito común
+    name_en: Long-Tailed Tit
 title: A Shape-Shifting Bird
 notes:
   - The back, between the wings.

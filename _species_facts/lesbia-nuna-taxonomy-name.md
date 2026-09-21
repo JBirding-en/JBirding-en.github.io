@@ -1,5 +1,8 @@
 ---
-species: Lesbia nuna
+species:
+  - name_sci: Lesbia nuna
+    name_es: Colibrí colilargo menor
+    name_en: Green-Tailed Trainbearer
 title: Sapphic Hummingbirds
 notes:
   - The linked page is supposed to show the genus *Sappho* in the original book, but is empty in the scanned document.

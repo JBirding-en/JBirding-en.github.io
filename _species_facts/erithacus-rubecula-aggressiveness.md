@@ -1,5 +1,8 @@
 ---
-species: Erithacus rubecula
+species:
+  - name_sci: Erithacus rubecula
+    name_es: Petirrojo europeo
+    name_en: European Robin
 title: This Bird Is More Aggressive Than You Think
 notes:
   - The parameter measured by the paper is "vocal performance", which is defined as the degree of vocalization close to the respiratory limit of the bird.
